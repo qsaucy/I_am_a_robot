@@ -5,7 +5,8 @@ import time
 import argparse
 from config import DELIMITER
 from pypeteer_utils import load_page, locate_captcha, click_element, locate_challenge
-
+if not os.path.exists("downloader"):
+    os.mkdir("downloader")
 ROOT_DIRECTORY = "downloader"+DELIMITER
 
 
