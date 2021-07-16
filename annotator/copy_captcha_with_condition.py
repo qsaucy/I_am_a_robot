@@ -74,6 +74,10 @@ def split_image(captcha_format,dest,dir_name):
 
 
 def prepare_picture():
+    """
+
+    :return:
+    """
     user_args=manage_parameters()
     if not os.path.exists(user_args.dest):
         os.mkdir(user_args.dest)

@@ -1,4 +1,5 @@
 import os
+
 import torch
 import torch.nn as nn
 import torch.utils.data
@@ -7,9 +8,11 @@ from PIL import Image
 import torchvision.transforms as transforms
 import numpy as np
 from glob import glob
-from configure_model import DEFAULT_MODEL, DEFAULT_MODEL_KNOWNLEDGE, SPECIFIC_MODEL
+
+from config import DELIMITER
+from .configure_model import DEFAULT_MODEL, DEFAULT_MODEL_KNOWNLEDGE, SPECIFIC_MODEL
 #create the tmp directory if not exist
-storage_tmp_captcha = "tmp_split"
+storage_tmp_captcha = "solver"+DELIMITER+"tmp_split"
 if not os.path.exists(storage_tmp_captcha):
     os.mkdir(storage_tmp_captcha)
 # defined on which device the model will run cpu or gpu(cuda)
@@ -27,7 +30,7 @@ def select_model(to_search, captcha_format):
     :param captcha_format: is a 3x3 or 4x4 captcha
     :return: model name to use
     """
-    if captcha_format != 4:
+    if captcha_format != 4 and to_search in SPECIFIC_MODEL:
         return SPECIFIC_MODEL[to_search]
     return DEFAULT_MODEL
 
@@ -64,7 +67,7 @@ def split_image(nbr_col, src, dest):
     for i, box in enumerate(boxes):
         cropped_img = img.crop(box)
         cropped_img.save(
-            dest + "/" + src.split("/")[-1].split(".")[0] + str(i) + ".png")
+            dest + DELIMITER + src.split(DELIMITER)[-1].split(".")[0] + str(i) + ".png")
 
 
 def predict_captcha(img, to_search, captcha_format):
@@ -72,6 +75,8 @@ def predict_captcha(img, to_search, captcha_format):
     map_location = device
     if to_search == "cars":
         to_search = "car"
+    if to_search == "crosswalks":
+        to_search = "crosswalk"
     if to_search == "buses":
         to_search = "bus"
     if to_search == "traffic lights":
@@ -81,10 +86,10 @@ def predict_captcha(img, to_search, captcha_format):
     if to_search == "motorcycles":
         to_search = "motorcycle"
     model_name = select_model(to_search, captcha_format)
-
+    model_name = os.getcwd()+model_name
     model = torch.load(model_name, map_location=map_location)
     to_select = []
-    if model_name == DEFAULT_MODEL:
+    if model_name.split(DELIMITER)[-1] == DEFAULT_MODEL.split(DELIMITER)[-1]:
 
         if to_search not in DEFAULT_MODEL_KNOWNLEDGE:
             return [False] * 16
@@ -115,12 +120,12 @@ def predict_captcha(img, to_search, captcha_format):
         for i, file in enumerate(glob(os.path.join(storage_tmp_captcha, "*"))):
             img = Image.open(file).convert("RGB")
 
-            img = transform(img)
             #add one dimension to have same format as model
+            img = transform(img)
             img = np.reshape(img, (1, img.shape[0], img.shape[1], img.shape[2]))
             if str(device) == "cuda":
                 img = img.to(device)
-            outputs = model(img.cuda())
+            outputs = model(img.to(device))
             # use softmax to calculate the confidence score
             sm = nn.Softmax(dim=1)
             outputs = sm(outputs)
@@ -134,5 +139,3 @@ def predict_captcha(img, to_search, captcha_format):
 
             os.remove(file)
     return to_select
-
-print(predict_captcha("img_test/cars1.png","car",4))

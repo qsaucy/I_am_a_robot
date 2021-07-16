@@ -11,9 +11,9 @@ def manage_parameters():
     dataset_path(required) : Root directory to load and save annotated dataset
     --dest_save : Path to the directory to save the annotated dataset
     --value_dataset : The value to set for picture with target element . Default value 0
-    --ratio : The ratio for keeping picture without having target element.Default 50. Usually captcha has 6/9 pictures without target and 3/9.
+    --ratio : The ratio for keeping picture without having target element.Usually captcha 3x3 has 6/9 pictures without target and 3/9. To keep a balanced dataset use 50. Default value 50.
     --src_dataset : name of the dataset filename. Default dataset
-    To keep a balanced dataset use 50. Default value 50.
+
     :return: array with all user input
     """
     parser = argparse.ArgumentParser(description='Annotated Dataset.')

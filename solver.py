@@ -1,27 +1,15 @@
-import ascii_art_captcha
-from predict_captcha import predict_captcha
+from solver.ascii_art_captcha import get_ascci_captcha
+from solver.predict_captcha import predict_captcha
+from config import DELIMITER
 import asyncio
 import random
 import os
 import string
-
+from pypeteer_utils import load_page, locate_captcha, locate_challenge, click_element
 import time
 import argparse
-
-from pyppeteer import launch
-# Optionnal library to help pypeteer to act sleatlhier
-from pyppeteer_stealth import stealth
-
+import shutil
 import re
-
-
-async def click_element(element_to_click):
-    """ send click event to element_to_click
-
-    :param element_to_click: html element
-    :return:
-    """
-    return await element_to_click.click(options={"delay": random.randint(10, 100)})
 
 
 def url_format(url_value, pat=re.compile(r"(http[s]?://)?(.*@)?(www\.)?([0-9a-z\-_]+\.)+[a-z]{1,5}(:[0-9]{1,5})?/?.*")):
@@ -125,55 +113,6 @@ async def fill_randomly(element, type, page):
     # await element.screenshot({'path': str(random.random())+"here.png"})
 
 
-async def load_page(url, headed=False):
-    """ create a browser show it if headed has True value
-    page.goto can raise errors :
-        - there's an SSL error (e.g. in case of self-signed certificates)
-        - target URL is invalid
-        - the ``timeout`` is exceeded during navigation
-        - then main resource failed to load
-    :param url: url to load
-    :param headed: has to show the chromium app
-    :return: pypeteer page object and browser to close it at the end
-    """
-    browser = await launch({"headless": not headed})
-    # browser = await launch()
-    page = await browser.newPage()
-
-    await stealth(page)  # <-- Here
-    await page.setExtraHTTPHeaders({
-        'Accept-Language': 'en'
-    })
-
-    await page.goto(url)
-    return browser, page
-
-
-async def locate_captcha(page, url, id, ascii=False):
-    """ Try to find captcha in the page. Captcha is store in iframe, open iframe then check if id id exist.
-    This id represent the checkbox recaptcha v2 button
-    Can raise error if no captcha found in the page.
-
-    :param page: Pypeteer page object
-    :param url:  use to print usefull error
-    :param id : identifiant of recaptcha object ( normaly recaptcha anchor or recaptcha verify button)
-    :param ascii: if true, print the beginrobot (locate in ascii_art_captcha)
-    :return: the frame contains captcha
-    """
-    captcha_iframe = -1
-    for i in range(len(page.frames)):
-        frame = page.frames[i]
-        if await frame.querySelector(id) is not None:
-            captcha_iframe = i
-            break
-    if ascii:
-        os.system('cls' if os.name == 'nt' else 'clear')
-        print(ascii_art_captcha.get_ascci_captcha("begin", "undefined", "undefined"))
-    if captcha_iframe == -1:
-        raise Exception("No captcha found on this page : " + url)
-    return page.frames[captcha_iframe]
-
-
 async def locate_form(page, form, url, num_form=0):
     """ locate the form to fill
     Can raise error:
@@ -194,32 +133,6 @@ async def locate_form(page, form, url, num_form=0):
         raise Exception(
             f"the website {url} has only {len(forms)} forms, can not reach the  {num_form + 1}th forms")
     return forms[num_form]
-
-
-async def locate_challenge(frame):
-    """ locate the captcha challenge then return usefull value
-    Can raise error if google banned you. Is check if the label can not be found. This can happen if you close the browser too.
-    :param frame: pypeteer frame object
-    :return: tuple
-            - captcha_format if the captcha is a 3x3 (3) or 4x4 (4)
-            - table is an array of the html td of the challenge
-            - target is an html div to screenshot containing the captcha
-            - to_search is the label to search in the challenge
-    """
-    # if search label is not found, probably has an error when loading challenge
-    if await frame.querySelector(".rc-imageselect-instructions strong") is None:
-        raise Exception(
-            "you are probably banned of recaptcha for too many tries, you can wait some time or change your external IP")
-    to_search = await frame.querySelectorEval(".rc-imageselect-instructions strong", 'node => node.innerText')
-
-    size1 = await  frame.querySelector(".rc-image-tile-44")
-    target = await frame.querySelector("#rc-imageselect-target")
-    captcha_format = 4
-    if size1 is None:
-        captcha_format = 3
-
-    table = await target.querySelectorAll('tr td')
-    return captcha_format, table, target, to_search
 
 
 async def fill_form(page, form, params, values):
@@ -274,7 +187,7 @@ async def main():
     # delay the printing ascii_art after locating the verify button, because it show the beginrobot
     if user_arguments.ascii:
         os.system('cls' if os.name == 'nt' else 'clear')
-        print(ascii_art_captcha.get_ascci_captcha("click", "undefined", "undefined"))
+        print(get_ascci_captcha("click", "undefined", "undefined"))
     while True:
         success_after += 1
         time.sleep(1)
@@ -283,11 +196,12 @@ async def main():
 
         if user_arguments.ascii:
             os.system('cls' if os.name == 'nt' else 'clear')
-            print(ascii_art_captcha.get_ascci_captcha("challenge", captcha_format, to_search))
+            print(get_ascci_captcha("challenge", captcha_format, to_search))
         if not user_arguments.ascii:
             print(to_search)
-
-        path = f"captcha/{captcha_format}{to_search}.png"
+        if not os.path.exists("solver" + DELIMITER + "captcha"):
+            os.mkdir("solver" + DELIMITER + "captcha")
+        path = f"solver" + DELIMITER + f"captcha" + DELIMITER + f"{captcha_format}{to_search}.png"
         await target.screenshot({'path': path})
         to_select = predict_captcha(path, to_search, captcha_format)
         os.remove(path)
@@ -305,19 +219,22 @@ async def main():
             random_value = random.random()
             nbr_reload_image = 0
             while new_image:
-                #wait time to google show new challenge.
+                # wait time to google show new challenge.
                 time.sleep(6)
                 new_tiles = await frame.querySelectorAll(".rc-image-tile-11")
                 new_image = False
+                if not os.path.exists("solver" + DELIMITER + "tmp"):
+                    os.mkdir("solver" + DELIMITER + "tmp")
                 for i, image in enumerate(new_tiles):
                     # check if the tile 1-1 has already been tested,  not possible to check if the ElementHandle equal between different loop, cannot get the src image, using pos in page works
                     if ((await image.boundingBox())["x"], (await image.boundingBox())["y"]) in already_test:
                         continue
-                    if os.path.exists("tmp/tile1-1.png"):
-                        os.remove("tmp/tile1-1.png")
-                    tmpPath = "tmp/tile1-1" + str(random_value) + "_" + str(increment) + ".png"
+                    if os.path.exists("solver" + DELIMITER + "tmp" + DELIMITER + "tile1-1.png"):
+                        os.remove("solver" + DELIMITER + "tmp" + DELIMITER + "tile1-1.png")
+                    tmpPath = "solver" + DELIMITER + "tmp" + DELIMITER + "tile1-1" + str(random_value) + "_" + str(
+                        increment) + ".png"
                     increment += 1
-                    #screenshot only the new tile. When project is in the headed mode seems like reloading
+                    # screenshot only the new tile. When project is in the headed mode seems like reloading
                     await image.screenshot({'path': tmpPath})
                     to_select = predict_captcha(tmpPath, to_search, 1)
                     os.remove(tmpPath)
@@ -340,7 +257,7 @@ async def main():
                 print("in " + str(success_after) + " captcha")
             else:
                 os.system('cls' if os.name == 'nt' else 'clear')
-                print(ascii_art_captcha.get_ascci_captcha("end"))
+                print(get_ascci_captcha("end"))
                 time.sleep(2)
             await browser.close()
             return success_after
@@ -359,14 +276,11 @@ async def main():
             await frame.click("#recaptcha-reload-button")
 
 
-
-times = []
-for i in range(1):
-    begin = time.time()
-    try:
-        nbr_captcha = asyncio.get_event_loop().run_until_complete(main())
-        end = time.time()
-        times.append((nbr_captcha, end - begin))
-        print(times)
-    except:
-        print("an error has been raised")
+try:
+    nbr_captcha = asyncio.get_event_loop().run_until_complete(main())
+    print(f"solved in {nbr_captcha}")
+finally:
+    # cleaning tmp directories
+    shutil.rmtree("solver" + DELIMITER + "tmp_split")
+    shutil.rmtree("solver" + DELIMITER + "tmp")
+    shutil.rmtree("solver" + DELIMITER + "captcha")
