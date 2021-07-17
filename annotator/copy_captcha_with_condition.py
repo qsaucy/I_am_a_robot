@@ -10,7 +10,7 @@ from config import DELIMITER
 
 def manage_parameters():
     """get user input. Some arguments are required and other are optional. Arguments started with
-    captcha_format : number of column and line to split. Default value 3
+    --captcha_format : number of column and line to split. Default value 3
     --dest  : absolute destination directory to store unsplitted captcha. Create a rawfile directory in it
     --dir : destination directory to store splitted captcha in dest directory.
     --src : Source directory to copy file.

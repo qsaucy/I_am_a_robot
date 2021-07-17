@@ -1,6 +1,5 @@
 import asyncio
 import os
-from pyppeteer import launch
 import time
 import argparse
 from config import DELIMITER

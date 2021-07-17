@@ -8,7 +8,7 @@ from config import DELIMITER
 
 def manage_parameters():
     """get user input. Some arguments are required and other are optional. Arguments started with -- are optional
-    dataset_path(required) : Root directory to load and save annotated dataset
+    dataset_path(required) : Root directory to load and save annotated dataset same as --dest for copy_with_condition
     --dest_save : Path to the directory to save the annotated dataset
     --value_dataset : The value to set for picture with target element . Default value 0
     --ratio : The ratio for keeping picture without having target element.Usually captcha 3x3 has 6/9 pictures without target and 3/9. To keep a balanced dataset use 50. Default value 50.

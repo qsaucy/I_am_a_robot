@@ -281,6 +281,9 @@ try:
     print(f"solved in {nbr_captcha}")
 finally:
     # cleaning tmp directories
-    shutil.rmtree("solver" + DELIMITER + "tmp_split")
-    shutil.rmtree("solver" + DELIMITER + "tmp")
-    shutil.rmtree("solver" + DELIMITER + "captcha")
+    if os.path.exists("solver" + DELIMITER + "tmp_split"):
+        shutil.rmtree("solver" + DELIMITER + "tmp_split")
+    if os.path.exists("solver" + DELIMITER + "tmp"):
+        shutil.rmtree("solver" + DELIMITER + "tmp")
+    if os.path.exists("solver" + DELIMITER + "captcha"):
+        shutil.rmtree("solver" + DELIMITER + "captcha")
