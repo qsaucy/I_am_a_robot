@@ -17,7 +17,7 @@ def manage_parameters():
     :return: array with all user input
     """
     parser = argparse.ArgumentParser(description='Annotated Dataset.')
-    parser.add_argument('dataset_path')
+    parser.add_argument('dataset_path', help="Root directory to load and save annotated dataset")
     parser.add_argument('--dest_save', dest='dest_save', help="directory in dataset_path to save the file ")
     parser.add_argument("--value_dataset", dest='value_dataset',default=1,help="between 0 and 9 ")
     parser.add_argument("--ratio", dest='ratio',default=50, help="int between 0 and 100, ratio of keeping image without the target objective ")

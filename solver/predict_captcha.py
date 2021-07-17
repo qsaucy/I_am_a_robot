@@ -17,7 +17,6 @@ if not os.path.exists(storage_tmp_captcha):
     os.mkdir(storage_tmp_captcha)
 # defined on which device the model will run cpu or gpu(cuda)
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
 # a transform to create tensor from value
 transform = transforms.Compose(
     [transforms.ToTensor()])
