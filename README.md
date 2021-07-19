@@ -21,14 +21,14 @@
 
 
 # I am a robot
-I'am a robot is a bachelor project to help pentesters to automatise web attacks. 
+I'am a robot is a bachelor project to help pentesters to automatize web attacks. 
 This project targets to solve recaptcha v2 without user interaction. The project use machine learning to solve captcha.
 
 Google use 2 types of captcha. The first use 9 distinct pictures, the second split in 16 part a single picture. The way to solve 
 is very different. The first captcha can be split in 9 pictures and trying to know if this has or not the label. 
 For the second the model have to draw a mask and identify in which sub picture the mask is.
 
-The following data have been collect between 21.05.21 and 28.05.21. The ratio can change in the futur
+The following data have been collect between 21.05.21 and 28.05.21. The ratio can change in the future
 
 The ratio between 3x3 and 4x4 is not balanced and it is about 70% 3x3 and 30% 4x4.
 
@@ -67,7 +67,7 @@ I'am a robot already have multiple model to identify different labels:
   * Bicycle 83.38% : [bicycle_shufflenet_v2_x0_5.pt](https://github.com/qsaucy/I_am_a_robot/blob/readme/solver/model/bicycle_shufflenet_v2_x0_5.pt)          
   * Car 78.93%: [car_shufflenet_v2_x0_5.pt](https://github.com/qsaucy/I_am_a_robot/blob/readme/solver/model/car_shufflenet_v2_x0_5.pt)
 
-The pourcentage represent for one splitted image. A captcha is 9 images but sometimes can reload some image. To calculate passing captcha ratio : %<sup>9 or 12</sup>
+The percentage represent for one splitted image. A captcha is 9 images but sometimes can reload some image. To calculate passing captcha ratio : %<sup>9 or 12</sup>
 
 * Captcha 4x4 has two model based on the same dataset
   * [cityscape_25_model.pt](https://github.com/qsaucy/I_am_a_robot/blob/readme/solver/model/cityscape_25_model.pt)
@@ -94,7 +94,7 @@ Notice: tests did not show any difference between different website or location 
 
 ## install downloader
 
-The following command will install pypeteer and pypeteer-stealth with their dependances.
+The following command will install pypeteer and pypeteer-stealth with their dependences.
 
 run `pip install -r requirement/downloader_requirements.txt`
 
@@ -113,11 +113,7 @@ downloader.py [-h] [--dest DEST] [--sleeping_time SLEEPING_TIME] [--threshold TH
 * --threshold : Number of captcha to download, if you are not banned before. Default 100
 * --batch_name : The name for saving batch in --dest directoy. You will have a warning if the batch already exist. Default dataset
 
-### example
 
-```
-python downloader.py https://www.google.com/recaptcha/api2/demo
-```
 
 ## improvement downloader
 
@@ -125,6 +121,7 @@ python downloader.py https://www.google.com/recaptcha/api2/demo
 * Continue download after ban
   * Waiting time 
   * Changing IP
+  * Check user argument ( negative sleeping_time, etc)
 
 # Annotator
 
@@ -175,12 +172,86 @@ Annotator has 2 parts located in annotator directory.
 
 * Add question if user want to see picture ( currently not possible because of loosing focus when opening a picture)
 * Change the value to annotate dataset, replace it with a understandable value
+* Checking user_arguments 
 
 # Learner
 
+This part of the project as for objective to improve the different model. Currently the project has 2 learning ways.  Both use pytorch vision.
+
 ## install learner
 
+The following command will install the base to do learning, but to improve performance, it is recommended to install pytorch in this way :
+
+https://pytorch.org/get-started/locally/
+
+Then you can run
+
+*  captcha 3x3 
+
+  * `pip install -r requirement/learner_captcha_3_requirements.txt`
+  * You can manually build your dataset from [Downloader]( #Downloader ) and [Annotator]( #Annotator ) or a dataset already annotated can be downloaded at [captcha3 drive dataset](https://drive.google.com/drive/folders/1LSoEtU8nfA_Rdp71P09g7_iCG6X-puV4?usp=sharing)
+
+  
+
+* captcha 4x4 : `pip install -r requirement/learner_captcha_4_requirements.txt`
+
+  * The dataset use is the [Cityscapes dataset](https://www.cityscapes-dataset.com/) with little modification like deleting pictures without any label in captcha. The modified dataset and their corresponding mask can be found at:[captcha4 drive dataset](https://drive.google.com/drive/folders/1EOGYfffct7kMwMdDgjy2heed7Xpf1K1X?usp=sharing) (unzip  6.6Go )
+
+  The directory tree must be 
+
+  ```
+  root_directory
+  └───pictures
+  │   │.png
+  │   
+  └───masks
+  │   |.json
+  ```
+
+  
+
 ## use learner
+
+Captcha 3 command located at learner/captcha3 folder:
+
+```
+captcha_3.py [-h] [--batch_size BATCH_SIZE] [--ratio RATIO] [--num_workers NUM_WORKERS] [--lr LR]
+                    [--momentum MOMENTUM] [--num_epochs NUM_EPOCHS] [--num_classes NUM_CLASSES] --name NAME
+                    dataset_path
+```
+
+* dataset_path : Path to the dataset you create or download
+
+* --batch_size: The size of the batch to do learning. Can be reduce if you have not enough memory. Default 32
+* --ratio : How to divide the dataset between picture use for learning and picture to keep for testing. Default 75. The value represent percentage of picture for learning
+* --num_workers : Can be used to make evolution on multiple GPU. Default 0
+* --lr : Learning rate at the beginning of the learning. Default 0.001
+* --momentum : momentum use for the learning. Default 0.9
+* --num_epochs : Number of epoch before ending learning. Default 25
+* --num_classes : Number of classes to identify in the dataset. Should be the same as the annotated dataset. Data should be name of class_filename where class start at 0 and increment by 1 for each different class. If using given dataset the value should **not** be changed. If using other dataset can be changed. Default 2 
+* --name : Filename for the dataset without extension. The filename will finish with .pt
+
+Captcha 4 command located at learner/captcha4 folder:
+
+```
+captcha_4.py [-h] [--batch_size BATCH_SIZE] [--ratio RATIO] [--num_workers NUM_WORKERS] [--lr LR] [--momentum MOMENTUM] [--num_epochs NUM_EPOCHS] [--weight_decay WEIGHT_DECAY] [--step_size STEP_SIZE] [--gamma GAMMA] --name
+                    NAME
+                    dataset_path
+
+```
+
+* dataset_path : Path to the dataset you create or download
+
+* --batch_size: The size of the batch to do learning. Can be reduce if you have not enough memory. Default 2
+* --ratio : How to divide the dataset between picture use for learning and picture to keep for testing. Default 75. The value represent percentage of picture for learning
+* --num_workers : Can be used to make evolution on multiple GPU. Default 0
+* --lr : Learning rate at the beginning of the learning. Default 0.001
+* --momentum : momentum use for the learning. Default 0.9
+* --num_epochs : Number of epoch before ending learning. Default 25
+* --weight_decay : Weight decay adds a penalty term to the error function. Default 0.0005
+* --step_size : Number of epoch to wait to reduce learning rate. Default 3
+* -- gamma : Factor to reduce learning rate. Default 0.1
+* --name : Filename for the dataset without extension. The filename will finish with .pt
 
 ## improvement learner
 
@@ -193,3 +264,5 @@ Annotator has 2 parts located in annotator directory.
 ## improvement solver
 
 # credits
+
+M. Cordts, M. Omran, S. Ramos, T. Rehfeld, M. Enzweiler, R. Benenson, U. Franke, S. Roth, and B. Schiele, “The Cityscapes Dataset for Semantic  Urban Scene Understanding,” in *Proc. of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*,  2016
