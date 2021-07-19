@@ -32,19 +32,19 @@ def manage_parameters():
     """
     parser = argparse.ArgumentParser(description='Annotated Dataset.')
     parser.add_argument('dataset_path', help="Dataset to load")
-    parser.add_argument('--batch_size', dest='batch_size', default=32, type=int,
+    parser.add_argument('--batch_size', dest='batch_size', default=2, type=int,
                         help="size of the batch to load. Can be reduce if your memory is limited. Default 2")
     parser.add_argument("--ratio", dest='ratio', default=75, type=int,
-                        help="ratio between number of picture for learning and testing ")
+                        help="ratio between number of picture for learning and testing. Default 25")
     parser.add_argument("--num_workers", dest='num_workers', default=0, type=int,
-                        help="Can be used for doing evolution on multiple GPU. Default 0. You can ")
+                        help="Can be used for doing evolution on multiple GPU. Default 0")
     parser.add_argument("--lr", dest='lr', default=0.001, type=float,
-                        help="Learning rate at the beggining or the learning ")
-    parser.add_argument("--momentum", dest='momentum', default=0.9, type=float, help="momentum for learning")
-    parser.add_argument("--num_epochs", dest='num_epochs', default=25, type=int, help="Number of epoch during training")
-    parser.add_argument("--weight_decay",dest='weight_decay',default=0.0005,type=float,help="Weight decay adds a penalty term to the error function")
-    parser.add_argument("--step_size",dest='step_size',default=3,type=int,help="number of epoch to wait to reduce learning rate")
-    parser.add_argument("--gamma",dest='gamma',default=0.1,type=float,help="factor to reduce learning rate")
+                        help="Learning rate at the beggining or the learning. Default 0.0001 ")
+    parser.add_argument("--momentum", dest='momentum', default=0.9, type=float, help="momentum for learning. Default 0.9")
+    parser.add_argument("--num_epochs", dest='num_epochs', default=10, type=int, help="Number of epoch during training. Default 10")
+    parser.add_argument("--weight_decay",dest='weight_decay',default=0.0005,type=float,help="Weight decay adds a penalty term to the error function. Default 0.0005")
+    parser.add_argument("--step_size",dest='step_size',default=3,type=int,help="number of epoch to wait to reduce learning rate. Default 3")
+    parser.add_argument("--gamma",dest='gamma',default=0.1,type=float,help="factor to reduce learning rate. Default 0.1")
     parser.add_argument("--name", dest='name', required=True, help="Name of the trained model")
     args = parser.parse_args()
 

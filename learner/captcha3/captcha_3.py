@@ -31,13 +31,13 @@ def manage_parameters():
     parser.add_argument('--batch_size', dest='batch_size', default=32, type=int,
                         help="size of the batch to load. Can be reduce if your memory is limited. Default 32")
     parser.add_argument("--ratio", dest='ratio', default=75, type=int,
-                        help="ratio between number of picture for learning and testing ")
+                        help="ratio between number of picture for learning and testing. Default 75")
     parser.add_argument("--num_workers", dest='num_workers', default=0, type=int,
-                        help="Can be used for doing evolution on multiple GPU. Default 0. You can ")
+                        help="Can be used to make evolution on multiple GPU. Default 0.")
     parser.add_argument("--lr", dest='lr', default=0.001, type=float,
-                        help="Learning rate at the beggining or the learning ")
-    parser.add_argument("--momentum", dest='momentum', default=0.9, type=float, help="momentum for learning")
-    parser.add_argument("--num_epochs", dest='num_epochs', default=25, type=int, help="Number of epoch during training")
+                        help="Learning rate at the beggining or the learning. Default 0.001 ")
+    parser.add_argument("--momentum", dest='momentum', default=0.9, type=float, help="momentum for learning. Default 0.9")
+    parser.add_argument("--num_epochs", dest='num_epochs', default=25, type=int, help="Number of epoch during training. Default 25")
     parser.add_argument("--num_classes", dest='num_classes', default=2, type=int,
                         help="Number of class in the dataset. The solver use only 2 classes (has target or not)"
                              "Can be changed to improve learning and modifying model format. Default 2")
