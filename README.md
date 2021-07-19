@@ -20,41 +20,41 @@
 
 
 
-#I_am_a bot
+# I_am_a bot
 
-#prerequisites
+# prerequisites
 
-#Downloader
+# Downloader
 
-##install downloader
+## install downloader
 
-##use downloader
+## use downloader
 
-##improvement downloader
+## improvement downloader
 
 
-#Annotator
+# Annotator
 
-##install annotator
+## install annotator
 
-##use annotator
+## use annotator
 
-##improvement annotator
+## improvement annotator
 
-#Learner
+# Learner
 
-##install learner
+## install learner
 
-##use learner
+## use learner
 
-##improvement learner
+## improvement learner
 
-#Solver
+# Solver
 
-##install solver
+## install solver
 
-##use solver
+## use solver
 
-##improvement solver
+## improvement solver
 
-#credits
+# credits
