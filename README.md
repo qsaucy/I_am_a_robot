@@ -1,3 +1,7 @@
+![](images/begin.jpg)
+
+
+
 - [I'am a robot ]( #I-am-a-robot )
 - [prerequisites]( #prerequisites )
 - [Downloader]( #Downloader )
@@ -195,7 +199,7 @@ Then you can run
 
 * captcha 4x4 : `pip install -r requirement/learner_captcha_4_requirements.txt`
 
-  * The dataset use is the [Cityscapes dataset](https://www.cityscapes-dataset.com/) with little modification like deleting pictures without any label in captcha. The modified dataset and their corresponding mask can be found at:[captcha4 drive dataset](https://drive.google.com/drive/folders/1EOGYfffct7kMwMdDgjy2heed7Xpf1K1X?usp=sharing) (unzip  6.6Go )
+  * The dataset use is the [Cityscapes dataset](https://www.cityscapes-dataset.com/) with little modification like deleting pictures without any label in captcha. The modified dataset and their corresponding mask can be found at [captcha4 drive dataset](https://drive.google.com/drive/folders/1EOGYfffct7kMwMdDgjy2heed7Xpf1K1X?usp=sharing) (unzip  6.6Go )
 
   The directory tree must be 
 
@@ -255,14 +259,61 @@ captcha_4.py [-h] [--batch_size BATCH_SIZE] [--ratio RATIO] [--num_workers NUM_W
 
 ## improvement learner
 
+* Captcha 4 accept other dataset
+* check user arguments
+* add --verbose
+
 # Solver
+
+This part of the project as for objective to automatically solve Recaptcha v2 from given website. It can automatically fill require form input or accept user input.
 
 ## install solver
 
+The following command will install the base to solve, but to improve performance, it is recommended to install pytorch in this way(same as [how to install learner step]( #install-learner ) ) :
+
+https://pytorch.org/get-started/locally/
+
+Then run `pip install -r requirement/solver_cpu_requirements.txt `
+
 ## use solver
+
+```
+solver.py [-h] [--form FORM] [--params [PARAMS ...]] [--values [VALUES ...]] [--num_form NUM_FORM] [--ascii] [--headed] url
+```
+
+* url : url of the website to solve captcha. This url has to have a captcha
+* --form : how to find the form to fill in the page.
+      - for a html id, need to add # before idname
+      - for a html class, need to add . before classname
+      - for the form tag, nothing to add
+    - --num-form : select the nth form in the page. Default value 0
+    - --params : form field to fill. If none search required one. If at least one is given, doesn't fill other field, optionnal or required
+    - --values : fill the --params field with user values. If values is not given or not enough values given, fill randomly. Produce error if params is smaller than values.
+    - --ascii  : remove message (type of captcha, google result...) and replace it with ascii art :warning: clear terminal :warning: 
+    - --headed : run in front pypeteer, usally use for debugging
 
 ## improvement solver
 
+* ameliorate exception handling
+* find better way to fill select form
+* find call to know when reloaded picture is printed. Currently wait 6 seconds
+
 # credits
 
-M. Cordts, M. Omran, S. Ramos, T. Rehfeld, M. Enzweiler, R. Benenson, U. Franke, S. Roth, and B. Schiele, “The Cityscapes Dataset for Semantic  Urban Scene Understanding,” in *Proc. of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*,  2016
+![](images/credit_success.JPG)
+
+
+
+Cityscape : M. Cordts, M. Omran, S. Ramos, T. Rehfeld, M. Enzweiler, R. Benenson, U. Franke, S. Roth, and B. Schiele, “The Cityscapes Dataset for Semantic  Urban Scene Understanding,” in *Proc. of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*,  2016
+
+
+
+
+
+Quentin Saucy
+
+
+
+Feel free to ask questions and adding scripts to improve the project
+
+I'am not a native english speaker, feel free to pull request with any typo fix
