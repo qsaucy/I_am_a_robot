@@ -1,4 +1,4 @@
-- [I'am a robot ]( #I-am-a-bot )
+- [I'am a robot ]( #I-am-a-robot )
 - [prerequisites]( #prerequisites )
 - [Downloader]( #Downloader )
     - [install]( ##install-downloader )
@@ -86,6 +86,10 @@ This part of the program can download google recaptcha from website you want. Th
 
 
 
+Captcha will be save in 4_4 or 3_3 folder. The file will be name as : *i_labelOfCaptcha.png* Where *i* is the iteration value and *labelOfCaptcha* the label of the captcha  
+
+
+
 Notice: tests did not show any difference between different website or location from where the script is run.   
 
 ## install downloader
@@ -122,14 +126,55 @@ python downloader.py https://www.google.com/recaptcha/api2/demo
   * Waiting time 
   * Changing IP
 
-
 # Annotator
+
+This part of the project is use to create dataset. Currently, the project allow to annotate only 3x3 captcha. Models at the moment are use for only one label. This choice has been made for helping learning. When a model has a good score, it is kept and he does not to have good score for every labels.
 
 ## install annotator
 
+The following command will install pillow package
+
+run ``pip install -r requirement/annotator_requirements.txt `
+
+
+
 ## use annotator
 
+Annotator has 2 parts located in annotator directory. 
+
+* copy_captcha_with_condition is a utils command to copy file from download step and split it to get ready for annotating phase. Pictures will be store splitted and unsplitted to check if the script works. Will ignore folder 4_4 to keep only 3x3 captcha. Picture will be rename with random lowercase string.
+
+  ```python
+  copy_captcha_with_condition.py [-h] [--captcha_format CAPTCHA_FORMAT] --dest DEST [--dir DIR] --src SRC --target TARGET
+  ```
+
+  * --captcha_format : Number of column and line to split. Default 3
+  * --dest : Directory to store unsplitted picture
+  * --dir : Directory to store splitted picture. Default dataset
+  * --src : Source directory to copy file to dir
+  *  --target : Captcha to copy, label you want
+
+* annotate: is the script to create dataset. The value annotated will be store in the picture filename. The first character is the class. The script will show a file name ( the first present in the dataset directory) and will wait for a value. You have to open the image or see it in the folder and if the picture has the target label enter the *value_dataset* else just type enter.
+
+  ```
+  annotate.py [-h] [--dest_save DEST_SAVE] [--value_dataset VALUE_DATASET] [--ratio RATIO] [--src_dataset DATASET] dataset_path
+  ```
+
+  * dataset_path: root directory of the dataset
+  * --dest_save : directory to save annotated dataset in dataset_path
+  * --value_dataset: Value to set to elements represent your target. default 1. Currently use values:
+    * crosswalk : 1
+    * fire_hydrant : 3
+    * bus : 4
+    * car : 5
+    * bicycle : 6
+  * --ratio : Ratio to keep image that not contain your target. recaptcha 3x3 has usually 3 pictures with label and 6 without. Default 50
+  * --src_dataset : Dataset name, same as --dir for *copy_captcha_with_condition*. Default dataset
+
 ## improvement annotator
+
+* Add question if user want to see picture ( currently not possible because of loosing focus when opening a picture)
+* Change the value to annotate dataset, replace it with a understandable value
 
 # Learner
 
