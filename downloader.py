@@ -11,11 +11,11 @@ ROOT_DIRECTORY = "downloader"+DELIMITER
 
 def manage_parameters():
     """get user input. Some arguments are required and other are optional. Arguments started with -- are optional
-    dataset_path(required) : Root directory to load and save annotated dataset
-    --dest_save : Path to the directory to save the annotated dataset
-    --value_dataset : The value to set for picture with target element . Default value 0
-    --ratio : The ratio for keeping picture without having target element.Usually captcha 3x3 has 6/9 pictures without target and 3/9. To keep a balanced dataset use 50. Default value 50.
-    --src_dataset : name of the dataset filename. Default dataset
+    url(required) : website to download captcha. Must have a captcha on the website
+    --dest : name of the sub directory in "downloader" to save the downloaded dataset. Default value downloaded_captcha
+    --sleeping_time : Time to wait between reloading captcha. If time is too small can produce white picture or google ban . Default value 10
+    --threshold : Number of captcha to download if not ban. Default value 100.
+    --batch_name : name of the dataset directory in --dest directory. Can produce a warning if the directory already exist. Default dataset
 
     :return: array with all user input
     """
