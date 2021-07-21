@@ -9,7 +9,7 @@ from config import DELIMITER
 
 
 def manage_parameters():
-    """get user input. Some arguments are required and other are optional. Arguments started with
+    """get user input. Some arguments are required and other are optional
     --captcha_format : number of column and line to split. Default value 3
     --dest  : absolute destination directory to store unsplitted captcha. Create a rawfile directory in it
     --dir : destination directory to store splitted captcha in dest directory.
@@ -39,10 +39,9 @@ def copy_with_condition(root,dest,condition):
     :return: None
     """
 
-    if root.split(DELIMITER)[-1] =="4_4" or root.split("\\")[-1]=="node_modules":
+    if root.split(DELIMITER)[-1] =="4_4" :
         return
     for file in sorted(glob(os.path.join(root, "*"))):
-        print(file)
         if os.path.isdir(file):
             copy_with_condition(file,dest,condition)
         elif condition in file.split(DELIMITER)[-1] :
