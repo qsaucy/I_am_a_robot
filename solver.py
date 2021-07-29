@@ -254,7 +254,7 @@ async def main():
         if response != "":
             if not user_arguments.ascii:
 
-                print("in " + str(success_after) + " captcha")
+                print("solved in " + str(success_after) + " captcha")
             else:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print(get_ascci_captcha("end"))
@@ -278,7 +278,6 @@ async def main():
 
 try:
     nbr_captcha = asyncio.get_event_loop().run_until_complete(main())
-    print(f"solved in {nbr_captcha}")
 finally:
     # cleaning tmp directories
     if os.path.exists("solver" + DELIMITER + "tmp_split"):
